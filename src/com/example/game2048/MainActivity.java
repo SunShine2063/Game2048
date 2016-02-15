@@ -1,14 +1,23 @@
 package com.example.game2048;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -22,6 +31,8 @@ public class MainActivity extends Activity {
 	private Button newGame;
 	private  GamenView gameView;
 	private AnimationLayer animationLayer = null;
+	
+	private boolean isExit = false;
 	
 	public MainActivity() 
 	{
@@ -102,5 +113,61 @@ public class MainActivity extends Activity {
 		return animationLayer;
 	}
 	
+	private Dialog EixtDialog(Context context)
+	{
+		AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+		dialog.setMessage("确定要退出游戏吗？");
+		dialog.setCancelable(false);
+		dialog.setPositiveButton("确定", new DialogInterface.OnClickListener()
+		{
+			@Override
+			public void onClick(DialogInterface dialog, int which)
+			{
+				dialog.dismiss();
+				MainActivity.this.finish();
+			}
+		});
+		dialog.setNegativeButton("取消", new DialogInterface.OnClickListener()
+		{
+			@Override
+			public void onClick(DialogInterface dialog, int which) 
+			{
+				dialog.dismiss();
+			}
+		});
+		return dialog.create();
+	}
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event)
+	{
+		if(keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0)
+		{
+			EixtDialog(MainActivity.this).show();
+			return true;
+		}
+		return super.onKeyDown(keyCode, event);
+	}
+	
+	private void ExitTwoClick()
+	{
+		Timer time = null;
+		if(isExit == false)
+		{
+			isExit = true;
+			Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
+			time = new Timer();
+			time.schedule(new TimerTask()
+			{
+				@Override
+				public void run() 
+				{
+					isExit = false;
+				}
+			}, 2000);
+		}else
+		{
+			MainActivity.this.finish();
+		}
+	}
 	
 }
